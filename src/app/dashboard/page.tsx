@@ -1,3 +1,4 @@
+// Fixed DashboardPage component
 'use client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BrainCircuit, CandlestickChart, Scale, Bot, Banknote, ShieldCheck, LogOut } from "lucide-react";
@@ -50,26 +51,73 @@ export default function DashboardPage() {
   const router = useRouter();
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) {
-        router.push('/get-started');
-      } else {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Auth error:', error);
+          router.replace('/get-started');
+          return;
+        }
+        if (!data.user) {
+          router.replace('/get-started');
+          return;
+        }
         setUser(data.user);
+      } catch (error) {
+        console.error('Error getting user:', error);
+        router.replace('/get-started');
+      } finally {
+        setIsLoading(false);
       }
     };
+    
     getUser();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_OUT' || !session) {
+          router.replace('/get-started');
+        } else if (event === 'SIGNED_IN' && session) {
+          setUser(session.user);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, [router, supabase.auth]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Sign out error:', error);
+      }
+      // The auth state change listener will handle the redirect
+    } catch (error) {
+      console.error('Unexpected sign out error:', error);
+      // Force redirect if there's an error
+      router.replace('/');
+    }
   };
   
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+          <p>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>;
+    return null; // This will be brief as useEffect will redirect
   }
 
   return (

@@ -16,7 +16,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const signUpSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -33,16 +33,39 @@ export default function GetStartedPage() {
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        router.push('/dashboard');
-        router.refresh();
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Auth check error:', error);
+        }
+        if (user) {
+          router.replace('/dashboard'); // Use replace instead of push
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking user:', error);
+      } finally {
+        setIsCheckingAuth(false);
       }
     };
+    
     checkUser();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          router.replace('/dashboard');
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, [router, supabase.auth]);
 
   const signUpForm = useForm<z.infer<typeof signUpSchema>>({
@@ -56,49 +79,85 @@ export default function GetStartedPage() {
   });
 
   const handleSignUp = async (values: z.infer<typeof signUpSchema>) => {
-    const { error } = await supabase.auth.signUp({
-      email: values.email,
-      password: values.password,
-      options: {
-        data: {
-          full_name: values.name,
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
+        options: {
+          data: {
+            full_name: values.name,
+          },
         },
-      },
-    });
+      });
 
-    if (error) {
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Sign up failed",
+          description: error.message,
+        });
+      } else {
+        toast({
+          title: "Success!",
+          description: "Check your email for a confirmation link.",
+        });
+        // Don't redirect immediately after signup - user needs to confirm email
+      }
+    } catch (error) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: error.message,
+        title: "Unexpected error",
+        description: "Something went wrong. Please try again.",
       });
-    } else {
-      toast({
-        title: "Success!",
-        description: "Check your email for a confirmation link.",
-      });
-      router.refresh();
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSignIn = async (values: z.infer<typeof signInSchema>) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password,
-    });
-
-    if (error) {
-       toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: error.message,
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
       });
-    } else {
-      router.push('/dashboard');
-      router.refresh();
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Sign in failed",
+          description: error.message,
+        });
+      } else if (data.user) {
+        // Success - the auth state change listener will handle the redirect
+        toast({
+          title: "Welcome back!",
+          description: "Redirecting to dashboard...",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Unexpected error",
+        description: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -159,8 +218,8 @@ export default function GetStartedPage() {
         <div className="max-w-md w-full">
             <Tabs defaultValue="signup" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 bg-slate-800/60">
-                    <TabsTrigger value="signup"><UserPlus className="mr-2"/>Sign Up</TabsTrigger>
-                    <TabsTrigger value="signin"><LogIn className="mr-2"/>Sign In</TabsTrigger>
+                    <TabsTrigger value="signup" disabled={isLoading}><UserPlus className="mr-2"/>Sign Up</TabsTrigger>
+                    <TabsTrigger value="signin" disabled={isLoading}><LogIn className="mr-2"/>Sign In</TabsTrigger>
                 </TabsList>
                 <TabsContent value="signup">
                     <Card className="bg-slate-900/50 border-cyan-400/20 text-white">
@@ -178,7 +237,7 @@ export default function GetStartedPage() {
                                   <FormItem>
                                     <FormLabel>Name</FormLabel>
                                     <FormControl>
-                                      <Input placeholder="John Doe" {...field} className="bg-slate-800/60 border-cyan-400/30"/>
+                                      <Input placeholder="John Doe" {...field} className="bg-slate-800/60 border-cyan-400/30" disabled={isLoading}/>
                                     </FormControl>
                                     <FormMessage />
                                   </FormItem>
@@ -191,7 +250,7 @@ export default function GetStartedPage() {
                                   <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
-                                      <Input type="email" placeholder="you@example.com" {...field} className="bg-slate-800/60 border-cyan-400/30"/>
+                                      <Input type="email" placeholder="you@example.com" {...field} className="bg-slate-800/60 border-cyan-400/30" disabled={isLoading}/>
                                     </FormControl>
                                     <FormMessage />
                                   </FormItem>
@@ -204,13 +263,15 @@ export default function GetStartedPage() {
                                   <FormItem>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
-                                      <Input type="password" placeholder="••••••••" {...field} className="bg-slate-800/60 border-cyan-400/30"/>
+                                      <Input type="password" placeholder="••••••••" {...field} className="bg-slate-800/60 border-cyan-400/30" disabled={isLoading}/>
                                     </FormControl>
                                     <FormMessage />
                                   </FormItem>
                                 )}
                               />
-                              <Button type="submit" className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">Create Account</Button>
+                              <Button type="submit" className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700" disabled={isLoading}>
+                                {isLoading ? "Creating Account..." : "Create Account"}
+                              </Button>
                             </form>
                           </Form>
                         </CardContent>
@@ -232,7 +293,7 @@ export default function GetStartedPage() {
                                     <FormItem>
                                       <FormLabel>Email</FormLabel>
                                       <FormControl>
-                                        <Input type="email" placeholder="you@example.com" {...field} className="bg-slate-800/60 border-cyan-400/30"/>
+                                        <Input type="email" placeholder="you@example.com" {...field} className="bg-slate-800/60 border-cyan-400/30" disabled={isLoading}/>
                                       </FormControl>
                                       <FormMessage />
                                     </FormItem>
@@ -245,7 +306,7 @@ export default function GetStartedPage() {
                                     <FormItem>
                                       <FormLabel>Password</FormLabel>
                                       <FormControl>
-                                        <Input type="password" placeholder="••••••••" {...field} className="bg-slate-800/60 border-cyan-400/30"/>
+                                        <Input type="password" placeholder="••••••••" {...field} className="bg-slate-800/60 border-cyan-400/30" disabled={isLoading}/>
                                       </FormControl>
                                       <FormMessage />
                                     </FormItem>
@@ -256,7 +317,9 @@ export default function GetStartedPage() {
                                     </div>
                                     <Link href="#" className="text-sm text-cyan-400 hover:underline">Forgot password?</Link>
                                 </div>
-                                <Button type="submit" className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">Sign In</Button>
+                                <Button type="submit" className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700" disabled={isLoading}>
+                                  {isLoading ? "Signing In..." : "Sign In"}
+                                </Button>
                               </form>
                           </Form>
                         </CardContent>
