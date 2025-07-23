@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Globe, Menu, Shield, Star } from "lucide-react";
 import Image from "next/image";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const brokers = [
   {
@@ -100,6 +100,9 @@ export default function BrokersPage() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="bg-slate-900/80 backdrop-blur-md border-cyan-400/20 text-white">
+                  <SheetHeader>
+                    <SheetTitle className="sr-only">Menu</SheetTitle>
+                  </SheetHeader>
                   <nav className="flex flex-col items-center gap-6 mt-12">
                       <a href="/product" className="text-xl text-gray-300 hover:text-white">Products</a>
                       <a href="/community" className="text-xl text-gray-300 hover:text-white">Community</a>

@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Menu, MessageSquare, Rss, ThumbsUp, UserPlus, Users } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const testimonials = [
   {
@@ -100,6 +100,9 @@ export default function CommunityPage() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="bg-slate-900/80 backdrop-blur-md border-cyan-400/20 text-white">
+                  <SheetHeader>
+                    <SheetTitle className="sr-only">Menu</SheetTitle>
+                  </SheetHeader>
                   <nav className="flex flex-col items-center gap-6 mt-12">
                       <a href="/product" className="text-xl text-gray-300 hover:text-white">Products</a>
                       <a href="/community" className="text-xl text-white">Community</a>
