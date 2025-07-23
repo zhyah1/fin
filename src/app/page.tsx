@@ -264,8 +264,8 @@ export default function SpaceFinLightLanding() {
 
     useEffect(() => {
         const checkUser = async () => {
-            const { data } = await supabase.auth.getUser();
-            if (data.user) {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
                 router.push('/dashboard');
             }
         };

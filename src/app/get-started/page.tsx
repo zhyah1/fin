@@ -36,9 +36,10 @@ export default function GetStartedPage() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
         router.push('/dashboard');
+        router.refresh();
       }
     };
     checkUser();
@@ -93,6 +94,7 @@ export default function GetStartedPage() {
         description: error.message,
       });
     } else {
+      router.push('/dashboard');
       router.refresh();
     }
   };
