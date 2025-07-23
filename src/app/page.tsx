@@ -361,7 +361,7 @@ export default function SpaceFinLightLanding() {
           </p>
           
           <div className="animate-fade-in-up space-y-6" style={{animationDelay: '0.6s'}}>
-            <Button asChild className="px-12 py-5 bg-white text-black rounded-full text-xl font-semibold transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-white/30 transform group">
+            <Button asChild size="lg" className="px-12 py-8 bg-white text-black rounded-full text-xl font-semibold transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-white/30 transform group">
                 <Link href="/get-started" className="flex items-center gap-3">
                     Get started for free
                     <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
