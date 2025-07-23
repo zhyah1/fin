@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Menu, X } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 
 const SpaceBackground = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -302,36 +304,38 @@ export default function SpaceFinLightLanding() {
           </div>
 
           <div className="lg:hidden">
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                  {isMenuOpen ? <X className="h-6 w-6"/> : <Menu className="h-6 w-6"/>}
-              </button>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6"/>
+                    <span className="sr-only">Toggle Menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="bg-slate-900/80 backdrop-blur-md border-cyan-400/20 text-white">
+                  <nav className="flex flex-col items-center gap-6 mt-12">
+                      <a href="/product" className="text-xl text-gray-300 hover:text-white">Products</a>
+                      <a href="/community" className="text-xl text-gray-300 hover:text-white">Community</a>
+                      <a href="/markets" className="text-xl text-gray-300 hover:text-white">Markets</a>
+                      <a href="/brokers" className="text-xl text-gray-300 hover:text-white">Brokers</a>
+                      <a href="/more" className="text-xl text-gray-300 hover:text-white">More</a>
+                      <div className="relative w-full max-w-xs mt-8">
+                          <input
+                              type="text"
+                              placeholder="Search..."
+                              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-cyan-400 focus:bg-white/15 backdrop-blur-md text-base"
+                          />
+                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300 text-sm">
+                             ⌘K
+                           </div>
+                      </div>
+                      <Button className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold text-lg">
+                          Get started
+                      </Button>
+                  </nav>
+                </SheetContent>
+              </Sheet>
           </div>
         </div>
-
-        {isMenuOpen && (
-            <div className="lg:hidden mt-4">
-                <nav className="flex flex-col items-center gap-4">
-                    <a href="/product" className="text-gray-300 hover:text-white">Products</a>
-                    <a href="/community" className="text-gray-300 hover:text-white">Community</a>
-                    <a href="/markets" className="text-gray-300 hover:text-white">Markets</a>
-                    <a href="/brokers" className="text-gray-300 hover:text-white">Brokers</a>
-                    <a href="/more" className="text-gray-300 hover:text-white">More</a>
-                    <div className="relative w-full max-w-xs mt-4">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-cyan-400 focus:bg-white/15 backdrop-blur-md transition-all duration-300 text-sm"
-                        />
-                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300 text-xs">
-                           ⌘K
-                         </div>
-                    </div>
-                    <button className="w-full mt-4 px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold">
-                        Get started
-                    </button>
-                </nav>
-            </div>
-        )}
       </header>
 
       {/* Main Hero Section */}

@@ -2,7 +2,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, Rss, ThumbsUp, UserPlus, Users } from "lucide-react";
+import { Menu, MessageSquare, Rss, ThumbsUp, UserPlus, Users } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const testimonials = [
   {
@@ -83,12 +84,34 @@ export default function CommunityPage() {
               </a>
             ))}
           </nav>
-          <div className="flex items-center gap-4 ml-8">
+          <div className="hidden lg:flex items-center gap-4 ml-8">
             <div className="text-sm text-gray-300 hover:text-white transition-colors cursor-pointer">🌐 EN</div>
             <div className="text-gray-300 hover:text-white transition-colors cursor-pointer">👤</div>
             <button className="px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transform">
               Get started
             </button>
+          </div>
+          <div className="lg:hidden">
+            <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6"/>
+                    <span className="sr-only">Toggle Menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="bg-slate-900/80 backdrop-blur-md border-cyan-400/20 text-white">
+                  <nav className="flex flex-col items-center gap-6 mt-12">
+                      <a href="/product" className="text-xl text-gray-300 hover:text-white">Products</a>
+                      <a href="/community" className="text-xl text-white">Community</a>
+                      <a href="/markets" className="text-xl text-gray-300 hover:text-white">Markets</a>
+                      <a href="/brokers" className="text-xl text-gray-300 hover:text-white">Brokers</a>
+                      <a href="/more" className="text-xl text-gray-300 hover:text-white">More</a>
+                      <Button className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold text-lg">
+                          Get started
+                      </Button>
+                  </nav>
+                </SheetContent>
+              </Sheet>
           </div>
         </div>
       </header>
