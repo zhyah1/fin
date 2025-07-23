@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { MessageCircle, Send, Bot, User, Loader2 } from "lucide-react";
 import { chat } from "@/ai/flows/chat";
+import type { ChatInput, ChatOutput } from "@/ai/schemas/chat";
 import { ScrollArea } from "./ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 

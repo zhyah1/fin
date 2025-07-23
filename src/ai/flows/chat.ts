@@ -3,11 +3,10 @@
  * @fileOverview AI chat flow with web search capabilities.
  *
  * - chat - A function that handles the chat process.
- * - ChatInput - The input type for the chat function.
- * - ChatOutput - The return type for the chat function.
  */
 
 import { ai } from '@/ai/genkit';
+import { ChatInputSchema, ChatOutputSchema, type ChatInput, type ChatOutput } from '@/ai/schemas/chat';
 import { z } from 'zod';
 
 const searchTheWeb = ai.defineTool(
@@ -32,25 +31,19 @@ const searchTheWeb = ai.defineTool(
   }
 );
 
-
-export const ChatInputSchema = z.object({
-  message: z.string().describe('The user message.'),
-});
-export type ChatInput = z.infer<typeof ChatInputSchema>;
-
-export const ChatOutputSchema = z.object({
-  response: z.string().describe("The AI's response to the user."),
-});
-export type ChatOutput = z.infer<typeof ChatOutputSchema>;
-
 const chatPrompt = ai.definePrompt({
     name: 'chatPrompt',
     input: { schema: ChatInputSchema },
     output: { schema: ChatOutputSchema },
     tools: [searchTheWeb],
-    prompt: `You are a friendly and helpful financial assistant for the FinVision app.
+    prompt: `You are a friendly and helpful financial assistant for the FinLight app.
 Your goal is to provide insightful and accurate information about financial markets, stocks, and investment strategies.
+
+About FinLight:
+FinLight is a powerful platform that provides AI-powered tools for financial analysis and investment. Our main products include an AI Portfolio Analyst, Market Sentiment AI, a Robo-Advisor, Predictive Market Trend analysis, Fraud Detection, and AI-Powered Credit Scoring. We connect users with top brokers and a vibrant community of traders.
+
 Use the tools available to you to find real-time information to answer the user's question.
+If the user asks about FinLight, use the information provided above.
 If you don't know the answer, say that you don't know.
 
 User's message: {{{message}}}

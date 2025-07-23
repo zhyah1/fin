@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { Chat } from '@/components/chat';
 
 const SpaceBackground = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -261,16 +262,42 @@ const marketPerformanceData = [
 export default function SpaceFinLightLanding() {
     const router = useRouter();
     const supabase = createClient();
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
 
     useEffect(() => {
-        const checkUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                router.push('/dashboard');
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          (event, session) => {
+            if (session?.user) {
+              router.replace('/dashboard');
             }
-        };
-        checkUser();
-    }, [router, supabase.auth]);
+            setIsCheckingAuth(false);
+          }
+        );
+    
+        const getInitialSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if(session?.user) {
+                 router.replace('/dashboard');
+            }
+            setIsCheckingAuth(false);
+        }
+        getInitialSession();
+    
+    
+        return () => subscription.unsubscribe();
+      }, [router, supabase.auth]);
+      
+      if (isCheckingAuth) {
+        return (
+          <div className="min-h-screen bg-black text-white flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+              <p>Loading...</p>
+            </div>
+          </div>
+        );
+      }
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden relative">
       {/* Beautiful Space Background */}
@@ -311,13 +338,14 @@ export default function SpaceFinLightLanding() {
           
           <div className="hidden lg:flex items-center gap-4">
             <div className="text-sm text-gray-300 hover:text-white transition-colors cursor-pointer">🌐 EN</div>
-            <div className="text-gray-300 hover:text-white transition-colors cursor-pointer">👤</div>
+             <Chat />
             <Button asChild className="px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transform">
               <Link href="/get-started">Get started</Link>
             </Button>
           </div>
 
-          <div className="lg:hidden">
+          <div className="lg:hidden flex items-center gap-2">
+              <Chat />
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon">
