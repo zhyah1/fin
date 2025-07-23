@@ -1,13 +1,13 @@
-
 // Fixed DashboardPage component
 'use client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BrainCircuit, CandlestickChart, Scale, Bot, Banknote, ShieldCheck, LogOut } from "lucide-react";
+import { BrainCircuit, CandlestickChart, Scale, Bot, Banknote, ShieldCheck, LogOut, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { Chat } from '@/components/chat';
 
 export default function DashboardPage() {
   const products = [
@@ -55,19 +55,17 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'SIGNED_OUT' || !session) {
+        if (!session) {
           router.replace('/get-started');
-        } else if (session) {
+        } else {
           setUser(session.user);
           setIsLoading(false);
         }
       }
     );
 
-    // Also check initial session
     const getInitialSession = async () => {
         const { data: { session } } = await supabase.auth.getSession();
         if(!session) {
@@ -84,17 +82,8 @@ export default function DashboardPage() {
   }, [router, supabase.auth]);
 
   const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Sign out error:', error);
-      }
-      // The auth state change listener will handle the redirect
-    } catch (error) {
-      console.error('Unexpected sign out error:', error);
-      // Force redirect if there's an error
-      router.replace('/');
-    }
+    await supabase.auth.signOut();
+    router.replace('/get-started');
   };
   
   if (isLoading) {
@@ -109,7 +98,7 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-    return null; // This will be brief as useEffect will redirect
+    return null; 
   }
 
   return (
@@ -120,7 +109,8 @@ export default function DashboardPage() {
             Dashboard
           </div>
           <div className="flex items-center gap-4">
-             <p className="text-gray-300">Welcome, {user.email}</p>
+            <Chat />
+             <p className="text-gray-300 hidden sm:block">Welcome, {user.email}</p>
             <Button onClick={handleSignOut} variant="outline" className="bg-transparent border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black">
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
@@ -159,5 +149,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
