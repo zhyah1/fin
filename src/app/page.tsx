@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Menu, X } from 'lucide-react';
 
 const SpaceBackground = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -253,53 +254,84 @@ const marketPerformanceData = [
   };
 
 export default function SpaceFinLightLanding() {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden relative">
       {/* Beautiful Space Background */}
       <SpaceBackground />
       
       {/* Header with enhanced space theme */}
-      <header className="relative z-50 px-6 py-4 backdrop-blur-md bg-black/20 border-b border-white/10">
+      <header className="relative z-50 px-4 sm:px-6 py-4 backdrop-blur-md bg-black/20 border-b border-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <a href="/" className="flex items-center gap-3">
             <div className="text-2xl font-bold text-white bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">FL</div>
             <div className="text-xl font-semibold text-white">FinLight</div>
           </a>
           
-          <div className="flex-1 max-w-md mx-8">
-            <div className="relative">
+          <div className="hidden lg:flex flex-1 justify-center items-center gap-8">
+            <nav className="flex items-center gap-8">
+              <a href="/product" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 relative group">
+                Products
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 group-hover:w-full transition-all duration-300"></span>
+              </a>
+              {['Community', 'Markets', 'Brokers', 'More'].map((item) => (
+                <a key={item} href={`/${item.toLowerCase()}`} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 relative group">
+                  {item}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 group-hover:w-full transition-all duration-300"></span>
+                </a>
+              ))}
+            </nav>
+            <div className="relative max-w-xs w-full">
               <input
                 type="text"
-                placeholder="Search (Ctrl+K)"
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-cyan-400 focus:bg-white/15 backdrop-blur-md transition-all duration-300"
+                placeholder="Search..."
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-cyan-400 focus:bg-white/15 backdrop-blur-md transition-all duration-300 text-sm"
               />
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300">
-                🔍
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300 text-xs">
+                ⌘K
               </div>
             </div>
           </div>
           
-          <nav className="hidden lg:flex items-center gap-8">
-            <a href="/product" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 relative group">
-              Products
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 group-hover:w-full transition-all duration-300"></span>
-            </a>
-            {['Community', 'Markets', 'Brokers', 'More'].map((item) => (
-              <a key={item} href={`/${item.toLowerCase()}`} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 relative group">
-                {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 group-hover:w-full transition-all duration-300"></span>
-              </a>
-            ))}
-          </nav>
-          
-          <div className="flex items-center gap-4 ml-8">
+          <div className="hidden lg:flex items-center gap-4">
             <div className="text-sm text-gray-300 hover:text-white transition-colors cursor-pointer">🌐 EN</div>
             <div className="text-gray-300 hover:text-white transition-colors cursor-pointer">👤</div>
             <button className="px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transform">
               Get started
             </button>
           </div>
+
+          <div className="lg:hidden">
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                  {isMenuOpen ? <X className="h-6 w-6"/> : <Menu className="h-6 w-6"/>}
+              </button>
+          </div>
         </div>
+
+        {isMenuOpen && (
+            <div className="lg:hidden mt-4">
+                <nav className="flex flex-col items-center gap-4">
+                    <a href="/product" className="text-gray-300 hover:text-white">Products</a>
+                    <a href="/community" className="text-gray-300 hover:text-white">Community</a>
+                    <a href="/markets" className="text-gray-300 hover:text-white">Markets</a>
+                    <a href="/brokers" className="text-gray-300 hover:text-white">Brokers</a>
+                    <a href="/more" className="text-gray-300 hover:text-white">More</a>
+                    <div className="relative w-full max-w-xs mt-4">
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-cyan-400 focus:bg-white/15 backdrop-blur-md transition-all duration-300 text-sm"
+                        />
+                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300 text-xs">
+                           ⌘K
+                         </div>
+                    </div>
+                    <button className="w-full mt-4 px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold">
+                        Get started
+                    </button>
+                </nav>
+            </div>
+        )}
       </header>
 
       {/* Main Hero Section */}
