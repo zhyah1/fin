@@ -18,6 +18,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    // Supabase uses TransformStream which is not available in Node.js.
+    // This polyfill is required for server-side rendering.
+     if (isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'web-streams-polyfill/dist/ponyfill.es2018.js': require.resolve(
+          'web-streams-polyfill/dist/ponyfill.es2018.js'
+        ),
+      };
+    }
+    return config;
+  }
 };
 
 export default nextConfig;

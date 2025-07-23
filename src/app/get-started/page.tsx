@@ -8,10 +8,88 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Menu, LogIn, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
+
+const signUpSchema = z.object({
+  name: z.string().min(1, { message: "Name is required" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+});
+
+const signInSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(1, { message: "Password is required" }),
+});
 
 export default function GetStartedPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const supabase = createClient();
+
+  const signUpForm = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: { name: "", email: "", password: "" },
+  });
+
+  const signInForm = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: { email: "", password: "" },
+  });
+
+  const handleSignUp = async (values: z.infer<typeof signUpSchema>) => {
+    const { error } = await supabase.auth.signUp({
+      email: values.email,
+      password: values.password,
+      options: {
+        data: {
+          full_name: values.name,
+        },
+      },
+    });
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: "Success!",
+        description: "Check your email for a confirmation link.",
+      });
+      router.push('/dashboard');
+    }
+  };
+
+  const handleSignIn = async (values: z.infer<typeof signInSchema>) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: values.email,
+      password: values.password,
+    });
+
+    if (error) {
+       toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: error.message,
+      });
+    } else {
+      router.push('/dashboard');
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-black text-white">
+      <Toaster />
       <header className="relative z-50 px-6 py-4 backdrop-blur-md bg-black/20 border-b border-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
@@ -77,20 +155,51 @@ export default function GetStartedPage() {
                             <CardTitle className="text-2xl">Create an Account</CardTitle>
                             <CardDescription>Join FinLight and start your journey to smarter investing.</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input id="name" placeholder="John Doe" className="bg-slate-800/60 border-cyan-400/30"/>
-                            </div>
-                             <div className="space-y-2">
-                                <Label htmlFor="email-signup">Email</Label>
-                                <Input id="email-signup" type="email" placeholder="you@example.com" className="bg-slate-800/60 border-cyan-400/30"/>
-                            </div>
-                             <div className="space-y-2">
-                                <Label htmlFor="password-signup">Password</Label>
-                                <Input id="password-signup" type="password" placeholder="••••••••" className="bg-slate-800/60 border-cyan-400/30"/>
-                            </div>
-                            <Button className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">Create Account</Button>
+                        <CardContent>
+                          <Form {...signUpForm}>
+                            <form onSubmit={signUpForm.handleSubmit(handleSignUp)} className="space-y-4">
+                              <FormField
+                                control={signUpForm.control}
+                                name="name"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Name</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="John Doe" {...field} className="bg-slate-800/60 border-cyan-400/30"/>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                               <FormField
+                                control={signUpForm.control}
+                                name="email"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                      <Input type="email" placeholder="you@example.com" {...field} className="bg-slate-800/60 border-cyan-400/30"/>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                               <FormField
+                                control={signUpForm.control}
+                                name="password"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                      <Input type="password" placeholder="••••••••" {...field} className="bg-slate-800/60 border-cyan-400/30"/>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <Button type="submit" className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">Create Account</Button>
+                            </form>
+                          </Form>
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -100,21 +209,43 @@ export default function GetStartedPage() {
                             <CardTitle className="text-2xl">Welcome Back</CardTitle>
                             <CardDescription>Sign in to access your dashboard and portfolio.</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                             <div className="space-y-2">
-                                <Label htmlFor="email-signin">Email</Label>
-                                <Input id="email-signin" type="email" placeholder="you@example.com" className="bg-slate-800/60 border-cyan-400/30"/>
-                            </div>
-                             <div className="space-y-2">
-                                <Label htmlFor="password-signin">Password</Label>
-                                <Input id="password-signin" type="password" placeholder="••••••••" className="bg-slate-800/60 border-cyan-400/30"/>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-2">
+                        <CardContent>
+                          <Form {...signInForm}>
+                              <form onSubmit={signInForm.handleSubmit(handleSignIn)} className="space-y-4">
+                                <FormField
+                                  control={signInForm.control}
+                                  name="email"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Email</FormLabel>
+                                      <FormControl>
+                                        <Input type="email" placeholder="you@example.com" {...field} className="bg-slate-800/60 border-cyan-400/30"/>
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={signInForm.control}
+                                  name="password"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Password</FormLabel>
+                                      <FormControl>
+                                        <Input type="password" placeholder="••••••••" {...field} className="bg-slate-800/60 border-cyan-400/30"/>
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                    </div>
+                                    <Link href="#" className="text-sm text-cyan-400 hover:underline">Forgot password?</Link>
                                 </div>
-                                <Link href="#" className="text-sm text-cyan-400 hover:underline">Forgot password?</Link>
-                            </div>
-                            <Button className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">Sign In</Button>
+                                <Button type="submit" className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">Sign In</Button>
+                              </form>
+                          </Form>
                         </CardContent>
                     </Card>
                 </TabsContent>
