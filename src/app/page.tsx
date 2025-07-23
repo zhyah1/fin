@@ -7,6 +7,8 @@ import { Menu, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
 
 const SpaceBackground = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -257,7 +259,18 @@ const marketPerformanceData = [
   };
 
 export default function SpaceFinLightLanding() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const router = useRouter();
+    const supabase = createClient();
+
+    useEffect(() => {
+        const checkUser = async () => {
+            const { data } = await supabase.auth.getUser();
+            if (data.user) {
+                router.push('/dashboard');
+            }
+        };
+        checkUser();
+    }, [router, supabase.auth]);
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden relative">
       {/* Beautiful Space Background */}

@@ -16,6 +16,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { useEffect } from "react";
 
 const signUpSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -32,6 +33,16 @@ export default function GetStartedPage() {
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        router.push('/dashboard');
+      }
+    };
+    checkUser();
+  }, [router, supabase.auth]);
 
   const signUpForm = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -65,7 +76,7 @@ export default function GetStartedPage() {
         title: "Success!",
         description: "Check your email for a confirmation link.",
       });
-      router.push('/dashboard');
+      router.refresh();
     }
   };
 
@@ -82,7 +93,7 @@ export default function GetStartedPage() {
         description: error.message,
       });
     } else {
-      router.push('/dashboard');
+      router.refresh();
     }
   };
 
