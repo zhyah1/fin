@@ -6,6 +6,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Menu, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const SpaceBackground = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -88,7 +89,7 @@ const SpaceBackground = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-black to-indigo-900"></div>
       
       {/* Animated nebula clouds */}
-      <div className="absolute inset-0">
+      {isMounted && <div className="absolute inset-0">
         {nebulaClouds.map(cloud => (
           <div
             key={cloud.key}
@@ -103,10 +104,10 @@ const SpaceBackground = () => {
             }}
           />
         ))}
-      </div>
+      </div>}
 
       {/* Floating planets */}
-      <div className="absolute inset-0">
+      {isMounted && <div className="absolute inset-0">
         {planets.map(planet => (
           <div
             key={planet.key}
@@ -140,10 +141,10 @@ const SpaceBackground = () => {
             )}
           </div>
         ))}
-      </div>
+      </div>}
 
       {/* Asteroid belt */}
-      <div className="absolute inset-0">
+      {isMounted && <div className="absolute inset-0">
         {asteroids.map(asteroid => (
           <div
             key={asteroid.key}
@@ -159,10 +160,10 @@ const SpaceBackground = () => {
             }}
           />
         ))}
-      </div>
+      </div>}
 
       {/* Enhanced star field */}
-      <div className="absolute inset-0">
+      {isMounted && <div className="absolute inset-0">
         {stars.map(star => (
           <div
             key={star.key}
@@ -182,10 +183,10 @@ const SpaceBackground = () => {
             }}
           />
         ))}
-      </div>
+      </div>}
 
       {/* Shooting stars with trails */}
-      <div className="absolute inset-0">
+      {isMounted && <div className="absolute inset-0">
         {[1, 2, 3, 4, 5].map(i => (
           <div
             key={i}
@@ -200,18 +201,18 @@ const SpaceBackground = () => {
             <div className="absolute top-1/2 left-1/2 w-16 h-0.5 bg-gradient-to-r from-white via-blue-200 to-transparent transform -translate-y-1/2 origin-left -rotate-45 blur-sm"></div>
           </div>
         ))}
-      </div>
+      </div>}
 
       {/* Solar flares */}
-      <div className="absolute top-10 right-20 w-32 h-32 opacity-40">
+      {isMounted && <div className="absolute top-10 right-20 w-32 h-32 opacity-40">
         <div className="w-full h-full bg-gradient-radial from-orange-400 via-red-500 to-transparent rounded-full animate-pulse blur-xl"></div>
-      </div>
-      <div className="absolute bottom-20 left-16 w-24 h-24 opacity-30">
+      </div>}
+      {isMounted && <div className="absolute bottom-20 left-16 w-24 h-24 opacity-30">
         <div className="w-full h-full bg-gradient-radial from-yellow-400 via-orange-500 to-transparent rounded-full animate-pulse blur-lg"></div>
-      </div>
+      </div>}
 
       {/* Cosmic dust particles */}
-       <div className="absolute inset-0">
+       {isMounted && <div className="absolute inset-0">
         {cosmicDust.map((dust, i) => (
           <div
             key={i}
@@ -223,7 +224,7 @@ const SpaceBackground = () => {
             }}
           />
         ))}
-      </div>
+      </div>}
 
       {/* Atmospheric glow layers */}
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/40"></div>
@@ -265,22 +266,22 @@ export default function SpaceFinLightLanding() {
       {/* Header with enhanced space theme */}
       <header className="relative z-50 px-4 sm:px-6 py-4 backdrop-blur-md bg-black/20 border-b border-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <a href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <div className="text-2xl font-bold text-white bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">FL</div>
             <div className="text-xl font-semibold text-white">FinLight</div>
-          </a>
+          </Link>
           
           <div className="hidden lg:flex flex-1 justify-center items-center gap-8">
             <nav className="flex items-center gap-8">
-              <a href="/product" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 relative group">
+              <Link href="/product" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 relative group">
                 Products
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 group-hover:w-full transition-all duration-300"></span>
-              </a>
+              </Link>
               {['Community', 'Markets', 'Brokers', 'More'].map((item) => (
-                <a key={item} href={`/${item.toLowerCase()}`} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 relative group">
+                <Link key={item} href={`/${item.toLowerCase()}`} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 relative group">
                   {item}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 group-hover:w-full transition-all duration-300"></span>
-                </a>
+                </Link>
               ))}
             </nav>
             <div className="relative max-w-xs w-full">
@@ -298,9 +299,9 @@ export default function SpaceFinLightLanding() {
           <div className="hidden lg:flex items-center gap-4">
             <div className="text-sm text-gray-300 hover:text-white transition-colors cursor-pointer">🌐 EN</div>
             <div className="text-gray-300 hover:text-white transition-colors cursor-pointer">👤</div>
-            <button className="px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transform">
-              Get started
-            </button>
+            <Button asChild className="px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transform">
+              <Link href="/get-started">Get started</Link>
+            </Button>
           </div>
 
           <div className="lg:hidden">
@@ -316,11 +317,11 @@ export default function SpaceFinLightLanding() {
                     <SheetTitle className="sr-only">Menu</SheetTitle>
                   </SheetHeader>
                   <nav className="flex flex-col items-center gap-6 mt-12">
-                      <a href="/product" className="text-xl text-gray-300 hover:text-white">Products</a>
-                      <a href="/community" className="text-xl text-gray-300 hover:text-white">Community</a>
-                      <a href="/markets" className="text-xl text-gray-300 hover:text-white">Markets</a>
-                      <a href="/brokers" className="text-xl text-gray-300 hover:text-white">Brokers</a>
-                      <a href="/more" className="text-xl text-gray-300 hover:text-white">More</a>
+                      <Link href="/product" className="text-xl text-gray-300 hover:text-white">Products</Link>
+                      <Link href="/community" className="text-xl text-gray-300 hover:text-white">Community</Link>
+                      <Link href="/markets" className="text-xl text-gray-300 hover:text-white">Markets</Link>
+                      <Link href="/brokers" className="text-xl text-gray-300 hover:text-white">Brokers</Link>
+                      <Link href="/more" className="text-xl text-gray-300 hover:text-white">More</Link>
                       <div className="relative w-full max-w-xs mt-8">
                           <input
                               type="text"
@@ -331,8 +332,8 @@ export default function SpaceFinLightLanding() {
                              ⌘K
                            </div>
                       </div>
-                      <Button className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold text-lg">
-                          Get started
+                      <Button asChild className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold text-lg">
+                          <Link href="/get-started">Get started</Link>
                       </Button>
                   </nav>
                 </SheetContent>
@@ -360,12 +361,12 @@ export default function SpaceFinLightLanding() {
           </p>
           
           <div className="animate-fade-in-up space-y-6" style={{animationDelay: '0.6s'}}>
-            <button className="px-12 py-5 bg-white text-black rounded-full text-xl font-semibold transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-white/30 transform group">
-              <span className="flex items-center gap-3">
-                Get started for free
-                <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
-              </span>
-            </button>
+            <Button asChild className="px-12 py-5 bg-white text-black rounded-full text-xl font-semibold transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-white/30 transform group">
+                <Link href="/get-started" className="flex items-center gap-3">
+                    Get started for free
+                    <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
+                </Link>
+            </Button>
             
             <p className="text-sm text-gray-400">
               $0 forever, no credit card needed ❤️
