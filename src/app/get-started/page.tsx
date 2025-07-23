@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -37,33 +38,28 @@ export default function GetStartedPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) {
-          console.error('Auth check error:', error);
-        }
-        if (user) {
-          router.replace('/dashboard'); // Use replace instead of push
-          return;
-        }
-      } catch (error) {
-        console.error('Error checking user:', error);
-      } finally {
-        setIsCheckingAuth(false);
-      }
-    };
-    
-    checkUser();
-
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' && session) {
+      (event, session) => {
+        if (session?.user) {
           router.replace('/dashboard');
+        } else {
+          setIsCheckingAuth(false);
         }
       }
     );
+
+    // Also check initial session
+    const getInitialSession = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if(session?.user) {
+             router.replace('/dashboard');
+        } else {
+            setIsCheckingAuth(false);
+        }
+    }
+    getInitialSession();
+
 
     return () => subscription.unsubscribe();
   }, [router, supabase.auth]);
@@ -331,3 +327,5 @@ export default function GetStartedPage() {
     </div>
   );
 }
+
+    

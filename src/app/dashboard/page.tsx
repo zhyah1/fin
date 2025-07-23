@@ -1,3 +1,4 @@
+
 // Fixed DashboardPage component
 'use client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,39 +55,30 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error) {
-          console.error('Auth error:', error);
-          router.replace('/get-started');
-          return;
-        }
-        if (!data.user) {
-          router.replace('/get-started');
-          return;
-        }
-        setUser(data.user);
-      } catch (error) {
-        console.error('Error getting user:', error);
-        router.replace('/get-started');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    getUser();
-
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (event === 'SIGNED_OUT' || !session) {
           router.replace('/get-started');
-        } else if (event === 'SIGNED_IN' && session) {
+        } else if (session) {
           setUser(session.user);
+          setIsLoading(false);
         }
       }
     );
+
+    // Also check initial session
+    const getInitialSession = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if(!session) {
+             router.replace('/get-started');
+        } else {
+            setUser(session.user);
+            setIsLoading(false);
+        }
+    }
+    getInitialSession();
+
 
     return () => subscription.unsubscribe();
   }, [router, supabase.auth]);
@@ -167,3 +159,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
