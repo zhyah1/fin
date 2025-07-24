@@ -97,7 +97,7 @@ export default function RoboAdvisorPage() {
                                                 <FormItem>
                                                     <FormLabel>Your Age</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" {...field} onChange={e => field.onChange(e.target.value === '' ? 0 : parseInt(e.target.value, 10))} value={field.value || ''} className="bg-slate-800/60 border-cyan-400/30" />
+                                                        <Input type="number" {...field} onChange={e => field.onChange(e.target.value === '' ? '' : parseInt(e.target.value, 10))} value={field.value || ''} className="bg-slate-800/60 border-cyan-400/30" />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -110,7 +110,7 @@ export default function RoboAdvisorPage() {
                                                 <FormItem>
                                                     <FormLabel>Annual Income (USD)</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" {...field} onChange={e => field.onChange(e.target.value === '' ? 0 : parseInt(e.target.value, 10))} value={field.value || ''} className="bg-slate-800/60 border-cyan-400/30" />
+                                                        <Input type="number" {...field} onChange={e => field.onChange(e.target.value === '' ? '' : parseInt(e.target.value, 10))} value={field.value || ''} className="bg-slate-800/60 border-cyan-400/30" />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -185,9 +185,9 @@ export default function RoboAdvisorPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="w-full h-[300px]">
-                                        <ResponsiveContainer>
+                                        <ChartContainer config={{}} className="w-full h-full">
                                             <PieChart>
-                                                <Tooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
+                                                <ChartTooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
                                                 <Legend />
                                                 <Pie data={allocationData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
                                                     {allocationData.map((entry, index) => (
@@ -195,7 +195,7 @@ export default function RoboAdvisorPage() {
                                                     ))}
                                                 </Pie>
                                             </PieChart>
-                                        </ResponsiveContainer>
+                                        </ChartContainer>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -206,40 +206,22 @@ export default function RoboAdvisorPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="w-full h-[400px] mb-8">
-                                        <ResponsiveContainer>
-                                            <BarChart data={etfAllocationData} layout="vertical">
+                                        <ChartContainer config={{}} className="w-full h-full">
+                                            <BarChart data={etfAllocationData} layout="vertical" margin={{ left: 20, right: 20 }}>
                                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                                                 <XAxis type="number" domain={[0, 100]} stroke="#888" tickFormatter={(value) => `${value}%`} />
                                                 <YAxis type="category" dataKey="ticker" stroke="#888" width={80} />
-                                                <Tooltip
+                                                <ChartTooltip
                                                     cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }}
-                                                    content={({ active, payload }) => {
-                                                        if (active && payload && payload.length) {
-                                                            const data = payload[0].payload;
-                                                            return (
-                                                                <div className="bg-slate-800 p-3 rounded-md border border-cyan-400/30 text-sm">
-                                                                    <p className="font-bold">{`${data.ticker} (${data.name})`}</p>
-                                                                    <p>Allocation: {data.allocation}%</p>
-                                                                    <p className="mt-2 text-gray-400 max-w-xs">{data.rationale}</p>
-                                                                </div>
-                                                            );
-                                                        }
-                                                        return null;
-                                                    }}
+                                                    content={<ChartTooltipContent />}
                                                 />
-                                                <Bar dataKey="allocation" name="Allocation" fill="url(#etfGradient)" radius={[0, 4, 4, 0]}>
+                                                <Bar dataKey="allocation" name="Allocation" radius={[0, 4, 4, 0]}>
                                                     {etfAllocationData.map((entry, index) => (
                                                         <Cell key={`cell-${index}`} fill={ETF_COLORS[index % ETF_COLORS.length]} />
                                                     ))}
                                                 </Bar>
-                                                 <defs>
-                                                    <linearGradient id="etfGradient" x1="0" y1="0" x2="1" y2="0">
-                                                        <stop offset="0%" stopColor="#8884d8" />
-                                                        <stop offset="100%" stopColor="#82ca9d" />
-                                                    </linearGradient>
-                                                </defs>
                                             </BarChart>
-                                        </ResponsiveContainer>
+                                        </ChartContainer>
                                     </div>
                                     <ul className="space-y-4">
                                         {advice.recommendedETFs.map(etf => (
