@@ -27,7 +27,8 @@ export default function ProductPage() {
       title: "Robo-Advisor",
       description: "Automated, algorithm-driven financial planning services with little to no human supervision. Your personal AI financial guide.",
       icon: <Bot className="h-8 w-8 text-cyan-400" />,
-      gradient: "from-indigo-900 via-slate-900 to-slate-900"
+      gradient: "from-indigo-900 via-slate-900 to-slate-900",
+      href: "/product/robo-advisor"
     },
     {
       title: "Predictive Market Trends",
