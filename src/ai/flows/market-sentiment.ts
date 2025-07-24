@@ -9,8 +9,9 @@
 import { ai } from '@/ai/genkit';
 import { googleAI } from '@genkit-ai/googleai';
 import { z } from 'zod';
-import { MarketSentimentInputSchema } from '../schemas/market-sentiment';
 import type { MarketSentimentInput, MarketSentimentOutput } from '../schemas/market-sentiment';
+import { MarketSentimentInputSchema } from '../schemas/market-sentiment';
+
 
 export async function analyzeMarketSentiment(input: MarketSentimentInput): Promise<MarketSentimentOutput> {
   const MarketSentimentOutputSchema = z.object({
@@ -78,7 +79,7 @@ Your task is to:
 4.  Write a concise \`summary\` explaining the key drivers of this sentiment, citing the news.
 5.  Return the original \`keyHeadlines\` you based your analysis on.
 
-The final output must be in a structured format.
+The final output must be in the structured format requested.
 
 User's query: {{{query}}}
 `,
