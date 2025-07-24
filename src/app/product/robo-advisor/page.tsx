@@ -18,7 +18,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RoboAdvisorInputSchema } from '@/ai/schemas/robo-advisor';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, Bar, XAxis, YAxis, CartesianGrid, BarChart } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 const ASSET_COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
