@@ -6,24 +6,30 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
-import { analyzePortfolio } from '@/ai/flows/analyze-portfolio';
+import { analyzePortfolio, type PortfolioAnalysisOutput } from '@/ai/flows/analyze-portfolio';
 import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#ff4d4d'];
 
 export default function PortfolioAnalystPage() {
-  const [stocks, setStocks] = useState('AAPL, GOOGL, TSLA');
-  const [analysis, setAnalysis] = useState('');
+  const [stocks, setStocks] = useState('AAPL, GOOGL, TSLA, MSFT, AMZN, NVDA');
+  const [analysis, setAnalysis] = useState<PortfolioAnalysisOutput | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAnalyze = async () => {
     setIsLoading(true);
-    setAnalysis('');
+    setAnalysis(null);
+    setError(null);
     try {
       const result = await analyzePortfolio({ stocks });
-      setAnalysis(result.analysis);
+      setAnalysis(result);
     } catch (error) {
       console.error(error);
-      setAnalysis('An error occurred while analyzing the portfolio.');
+      setError('An error occurred while analyzing the portfolio.');
     } finally {
       setIsLoading(false);
     }
@@ -43,12 +49,12 @@ export default function PortfolioAnalystPage() {
             </div>
       </header>
       <main className="px-4 py-16 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <Card className="bg-slate-900/50 border-cyan-400/20 text-white">
             <CardHeader>
               <CardTitle className="text-3xl text-center">AI Portfolio Analyst</CardTitle>
               <CardDescription className="text-center text-lg text-gray-300">
-                Enter your stock tickers (comma-separated) to get an AI-powered analysis.
+                Enter your stock tickers (comma-separated) to get an AI-powered analysis and visualization.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -67,18 +73,94 @@ export default function PortfolioAnalystPage() {
               </Button>
             </CardContent>
           </Card>
+          
+          {error && (
+             <Card className="mt-8 bg-red-900/30 border-red-500/50 text-white">
+                <CardHeader>
+                  <CardTitle className="text-2xl text-red-400">Analysis Failed</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>{error}</p>
+                </CardContent>
+              </Card>
+          )}
 
           {analysis && (
-            <Card className="mt-8 bg-slate-900/50 border-cyan-400/20 text-white">
-              <CardHeader>
-                <CardTitle className="text-2xl">Analysis Results</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="prose prose-invert max-w-none text-gray-300">
-                    <ReactMarkdown>{analysis}</ReactMarkdown>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="mt-8 space-y-8">
+              <Card className="bg-slate-900/50 border-cyan-400/20 text-white">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Portfolio Allocation</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="w-full h-[400px]">
+                      <ChartContainer config={{}} className="w-full h-full">
+                          <PieChart>
+                              <ChartTooltip content={<ChartTooltipContent nameKey="ticker" hideLabel />} />
+                              <Pie
+                                  data={analysis.portfolioAllocation}
+                                  dataKey="percentage"
+                                  nameKey="ticker"
+                                  cx="50%"
+                                  cy="50%"
+                                  outerRadius={150}
+                                  labelLine={false}
+                                  label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+                                      const RADIAN = Math.PI / 180;
+                                      const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                                      return (
+                                        <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+                                          {`${analysis.portfolioAllocation[index].ticker} (${(percent * 100).toFixed(0)}%)`}
+                                        </text>
+                                      );
+                                  }}
+                              >
+                                  {analysis.portfolioAllocation.map((entry, index) => (
+                                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                  ))}
+                              </Pie>
+                          </PieChart>
+                      </ChartContainer>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <div className="grid md:grid-cols-2 gap-8">
+                 <Card className="bg-slate-900/50 border-cyan-400/20 text-white">
+                    <CardHeader>
+                      <CardTitle className="text-2xl">Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="prose prose-invert max-w-none text-gray-300">
+                          <ReactMarkdown>{analysis.summary}</ReactMarkdown>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-slate-900/50 border-cyan-400/20 text-white">
+                    <CardHeader>
+                      <CardTitle className="text-2xl">Risk Analysis</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="prose prose-invert max-w-none text-gray-300">
+                          <ReactMarkdown>{analysis.riskAnalysis}</ReactMarkdown>
+                      </div>
+                    </CardContent>
+                  </Card>
+              </div>
+
+               <Card className="bg-slate-900/50 border-cyan-400/20 text-white">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Diversification Opportunities</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="prose prose-invert max-w-none text-gray-300">
+                      <ReactMarkdown>{analysis.diversificationOpportunities}</ReactMarkdown>
+                  </div>
+                </CardContent>
+              </Card>
+
+            </div>
           )}
         </div>
       </main>
