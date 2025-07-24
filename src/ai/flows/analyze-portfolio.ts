@@ -11,17 +11,17 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-const AnalyzePortfolioInputSchema = z.object({
-  stocks: z.string().describe('A comma-separated list of stock tickers.'),
-});
-export type AnalyzePortfolioInput = z.infer<typeof AnalyzePortfolioInputSchema>;
+export async function analyzePortfolio(input: { stocks: string; }): Promise<{ analysis: string; }> {
+  const AnalyzePortfolioInputSchema = z.object({
+    stocks: z.string().describe('A comma-separated list of stock tickers.'),
+  });
+  type AnalyzePortfolioInput = z.infer<typeof AnalyzePortfolioInputSchema>;
 
-const AnalyzePortfolioOutputSchema = z.object({
-  analysis: z.string().describe('The AI-generated analysis of the portfolio.'),
-});
-export type AnalyzePortfolioOutput = z.infer<typeof AnalyzePortfolioOutputSchema>;
+  const AnalyzePortfolioOutputSchema = z.object({
+    analysis: z.string().describe('The AI-generated analysis of the portfolio.'),
+  });
+  type AnalyzePortfolioOutput = z.infer<typeof AnalyzePortfolioOutputSchema>;
 
-export async function analyzePortfolio(input: AnalyzePortfolioInput): Promise<AnalyzePortfolioOutput> {
 
   const getStockInfo = ai.defineTool(
     {
@@ -50,13 +50,15 @@ export async function analyzePortfolio(input: AnalyzePortfolioInput): Promise<An
   const analysisPrompt = ai.definePrompt({
     name: 'portfolioAnalysisPrompt',
     input: { schema: AnalyzePortfolioInputSchema },
-    output: { schema: AnalyzePortfolioOutputSchema },
+    output: { schema: AnalyzePortfolioOutputSchema, format: 'json' },
     tools: [getStockInfo],
     prompt: `You are an expert financial analyst. A user has provided a list of stock tickers in their portfolio.
 Provide a brief analysis of the portfolio.
 For each stock, use the available tools to get its information.
 Based on the stocks provided, identify potential risks and suggest potential opportunities for diversification or growth.
 Format the output in Markdown.
+
+Your final output must be a JSON object with a single key "analysis" containing your markdown-formatted response.
 
 User's stocks: {{{stocks}}}
 `,
@@ -73,7 +75,7 @@ User's stocks: {{{stocks}}}
       if (!output) {
         return { analysis: "I'm sorry, I couldn't generate an analysis for your portfolio." };
       }
-      return { analysis: output.analysis };
+      return output;
     }
   );
 
