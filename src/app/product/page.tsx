@@ -13,7 +13,8 @@ export default function ProductPage() {
       title: "AI Portfolio Analyst",
       description: "Get deep insights into your investment portfolio. Our AI analyzes your holdings, identifies risks, and suggests opportunities for growth.",
       icon: <BrainCircuit className="h-8 w-8 text-cyan-400" />,
-      gradient: "from-cyan-900 via-slate-900 to-slate-900"
+      gradient: "from-cyan-900 via-slate-900 to-slate-900",
+      href: "/product/portfolio-analyst"
     },
     {
       title: "Market Sentiment AI",
@@ -113,18 +114,20 @@ export default function ProductPage() {
         <div className="mt-16 max-w-7xl mx-auto grid gap-8 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1">
           {products.map((product) => (
             <Card key={product.title} className="bg-slate-900/50 border-cyan-400/20 text-white flex flex-col overflow-hidden transition-all duration-300 hover:border-cyan-400/60 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/20">
-              <CardHeader className="flex flex-row items-start gap-4">
-                <div className="flex-shrink-0">{product.icon}</div>
-                <div>
-                  <CardTitle className="text-xl font-bold text-white">{product.title}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <div className="aspect-video relative mb-4">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${product.gradient} rounded-md`}></div>
-                </div>
-                <CardDescription className="text-gray-300 text-base">{product.description}</CardDescription>
-              </CardContent>
+                <Link href={product.href || '#'} className="flex flex-col h-full">
+                    <CardHeader className="flex flex-row items-start gap-4">
+                        <div className="flex-shrink-0">{product.icon}</div>
+                        <div>
+                        <CardTitle className="text-xl font-bold text-white">{product.title}</CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="flex-grow">
+                        <div className="aspect-video relative mb-4">
+                        <div className={`absolute inset-0 bg-gradient-to-br ${product.gradient} rounded-md`}></div>
+                        </div>
+                        <CardDescription className="text-gray-300 text-base">{product.description}</CardDescription>
+                    </CardContent>
+                </Link>
             </Card>
           ))}
         </div>
