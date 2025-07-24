@@ -14,10 +14,6 @@ export async function analyzePortfolio(input: { stocks: string; }): Promise<{ an
     stocks: z.string().describe('A comma-separated list of stock tickers.'),
   });
 
-  const AnalyzePortfolioOutputSchema = z.object({
-    analysis: z.string().describe('The AI-generated analysis of the portfolio.'),
-  });
-
   const getStockInfo = ai.defineTool(
     {
       name: 'getStockInfo',
@@ -45,15 +41,12 @@ export async function analyzePortfolio(input: { stocks: string; }): Promise<{ an
   const analysisPrompt = ai.definePrompt({
     name: 'portfolioAnalysisPrompt',
     input: { schema: AnalyzePortfolioInputSchema },
-    output: { schema: AnalyzePortfolioOutputSchema, format: 'json' },
     tools: [getStockInfo],
     prompt: `You are an expert financial analyst. A user has provided a list of stock tickers in their portfolio.
 Provide a brief analysis of the portfolio.
 For each stock, use the available tools to get its information.
 Based on the stocks provided, identify potential risks and suggest potential opportunities for diversification or growth.
-Format the analysis content in Markdown.
-
-Your final output must be a JSON object with a single key "analysis" containing your markdown-formatted response.
+Format the entire analysis as a single Markdown block.
 
 User's stocks: {{{stocks}}}
 `,
@@ -63,16 +56,14 @@ User's stocks: {{{stocks}}}
     {
       name: 'analysisFlow',
       inputSchema: AnalyzePortfolioInputSchema,
-      outputSchema: AnalyzePortfolioOutputSchema,
+      outputSchema: z.string(),
     },
     async (input) => {
-      const { output } = await analysisPrompt(input);
-      if (!output) {
-        return { analysis: "I'm sorry, I couldn't generate an analysis for your portfolio." };
-      }
-      return output;
+      const { text } = await analysisPrompt.generate(input);
+      return text;
     }
   );
 
-  return analysisFlow(input);
+  const analysisResult = await analysisFlow(input);
+  return { analysis: analysisResult };
 }
