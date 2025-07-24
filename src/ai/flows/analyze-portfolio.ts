@@ -59,7 +59,7 @@ User's stocks: {{{stocks}}}
       outputSchema: z.string(),
     },
     async (input) => {
-      const { text } = await analysisPrompt.generate(input);
+      const { text } = await analysisPrompt(input);
       return text;
     }
   );
