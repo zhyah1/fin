@@ -20,7 +20,8 @@ export default function ProductPage() {
       title: "Market Sentiment AI",
       description: "Stay ahead of market trends by understanding the sentiment. We analyze news, social media, and financial reports in real-time.",
       icon: <CandlestickChart className="h-8 w-8 text-cyan-400" />,
-      gradient: "from-blue-900 via-slate-900 to-slate-900"
+      gradient: "from-blue-900 via-slate-900 to-slate-900",
+      href: "/product/market-sentiment"
     },
     {
       title: "Robo-Advisor",

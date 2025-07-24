@@ -1,0 +1,98 @@
+
+'use server';
+/**
+ * @fileOverview A market sentiment analysis AI agent.
+ *
+ * - analyzeMarketSentiment - A function that handles the sentiment analysis process.
+ */
+
+import { ai } from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/googleai';
+import { z } from 'zod';
+import { MarketSentimentInputSchema, MarketSentimentOutputSchema } from '../schemas/market-sentiment';
+import type { MarketSentimentInput, MarketSentimentOutput } from '../schemas/market-sentiment';
+
+export async function analyzeMarketSentiment(input: MarketSentimentInput): Promise<MarketSentimentOutput> {
+
+  const searchTheWebForSentiment = ai.defineTool(
+    {
+      name: 'searchTheWebForSentiment',
+      description: 'Gets recent news headlines for a given financial topic or ticker.',
+      inputSchema: z.object({
+        query: z.string().describe('The financial topic or ticker to search for.'),
+      }),
+      outputSchema: z.object({
+        headlines: z.array(z.string()).describe('A list of recent news headlines.'),
+      }),
+    },
+    async ({ query }) => {
+      // Mock data for demonstration
+      console.log(`Searching web for sentiment on: ${query}`);
+      const mockHeadlines: { [key: string]: string[] } = {
+        'TSLA': [
+            "Tesla's new AI chip hailed as a 'game-changer' for autonomous driving.",
+            "Analysts raise concerns over Tesla's slowing sales in Q3.",
+            "Elon Musk announces ambitious new factory plans in Europe.",
+            "Tesla faces increased competition from legacy automakers.",
+            "Positive early reviews for the new Tesla Model 3 refresh."
+        ],
+        'AAPL': [
+            "Apple reports record-breaking iPhone sales, beating analyst expectations.",
+            "EU regulators launch another antitrust probe into Apple's App Store policies.",
+            "Vision Pro headset sees strong initial demand but faces supply constraints.",
+            "Analysts optimistic about Apple's long-term growth in services.",
+            "Warren Buffett trims Berkshire's stake in Apple."
+        ],
+        'US HOUSING MARKET': [
+            "Fed interest rate hikes continue to cool down the housing market.",
+            "Home prices see first nationwide decline in over a decade.",
+            "Housing affordability hits all-time low, sidelining first-time buyers.",
+            "Rental market remains strong amid high mortgage rates.",
+            "Builder confidence ticks up slightly on hopes of future rate cuts."
+        ]
+      };
+      const queryKey = query.toUpperCase();
+      const headlines = mockHeadlines[queryKey] || [`No specific news found for "${query}". Market sentiment appears neutral.`];
+      return { headlines };
+    }
+  );
+
+  const sentimentAnalysisPrompt = ai.definePrompt({
+    name: 'sentimentAnalysisPrompt',
+    input: { schema: MarketSentimentInputSchema },
+    output: { schema: MarketSentimentOutputSchema },
+    tools: [searchTheWebForSentiment],
+    model: googleAI.model('gemini-1.5-flash-latest'),
+    prompt: `You are an expert financial analyst specializing in market sentiment.
+A user has provided a query about a financial topic or stock ticker.
+
+Your task is to:
+1.  Use the \`searchTheWebForSentiment\` tool to fetch recent news headlines related to the user's query.
+2.  Analyze the provided headlines to determine the overall market sentiment.
+3.  Provide a \`sentimentScore\` from -1.0 (very negative) to 1.0 (very positive). A score around 0 indicates neutral sentiment.
+4.  Write a concise \`summary\` explaining the key drivers of this sentiment, citing the news.
+5.  Return the original \`keyHeadlines\` you based your analysis on.
+
+The final output must be in a structured format.
+
+User's query: {{{query}}}
+`,
+  });
+
+  const sentimentAnalysisFlow = ai.defineFlow(
+    {
+      name: 'sentimentAnalysisFlow',
+      inputSchema: MarketSentimentInputSchema,
+      outputSchema: MarketSentimentOutputSchema,
+    },
+    async (input) => {
+      const { output } = await sentimentAnalysisPrompt(input);
+      if (!output) {
+        throw new Error("Sentiment analysis failed to generate. The model returned no output.");
+      }
+      return output;
+    }
+  );
+
+  return sentimentAnalysisFlow(input);
+}
