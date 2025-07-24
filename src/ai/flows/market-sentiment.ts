@@ -10,15 +10,9 @@ import { ai } from '@/ai/genkit';
 import { googleAI } from '@genkit-ai/googleai';
 import { z } from 'zod';
 import type { MarketSentimentInput, MarketSentimentOutput } from '../schemas/market-sentiment';
-import { MarketSentimentInputSchema } from '../schemas/market-sentiment';
-
+import { MarketSentimentInputSchema, MarketSentimentOutputSchema } from '../schemas/market-sentiment';
 
 export async function analyzeMarketSentiment(input: MarketSentimentInput): Promise<MarketSentimentOutput> {
-  const MarketSentimentOutputSchema = z.object({
-      sentimentScore: z.number().min(-1).max(1).describe("A sentiment score from -1.0 (very negative) to 1.0 (very positive)."),
-      summary: z.string().describe("A concise summary explaining the key drivers of the sentiment, in Markdown format."),
-      keyHeadlines: z.array(z.string()).describe("A list of the key headlines that influenced the sentiment analysis.")
-  });
 
   const searchTheWebForSentiment = ai.defineTool(
     {
@@ -66,20 +60,28 @@ export async function analyzeMarketSentiment(input: MarketSentimentInput): Promi
   const sentimentAnalysisPrompt = ai.definePrompt({
     name: 'sentimentAnalysisPrompt',
     input: { schema: MarketSentimentInputSchema },
-    output: { schema: MarketSentimentOutputSchema },
+    output: { 
+      schema: MarketSentimentOutputSchema,
+      format: 'json' // Explicitly request JSON format
+    },
     tools: [searchTheWebForSentiment],
     model: googleAI.model('gemini-1.5-flash-latest'),
     prompt: `You are an expert financial analyst specializing in market sentiment.
 A user has provided a query about a financial topic or stock ticker.
 
 Your task is to:
-1.  Use the \`searchTheWebForSentiment\` tool to fetch recent news headlines related to the user's query.
-2.  Analyze the provided headlines to determine the overall market sentiment.
-3.  Provide a \`sentimentScore\` from -1.0 (very negative) to 1.0 (very positive). A score around 0 indicates neutral sentiment.
-4.  Write a concise \`summary\` explaining the key drivers of this sentiment, citing the news.
-5.  Return the original \`keyHeadlines\` you based your analysis on.
+1. Use the \`searchTheWebForSentiment\` tool to fetch recent news headlines related to the user's query.
+2. Analyze the provided headlines to determine the overall market sentiment.
+3. Provide a \`sentimentScore\` from -1.0 (very negative) to 1.0 (very positive). A score around 0 indicates neutral sentiment.
+4. Write a concise \`summary\` explaining the key drivers of this sentiment, citing the news.
+5. Return the original \`keyHeadlines\` you based your analysis on.
 
-The final output must be in the structured format requested.
+IMPORTANT: You must respond with a valid JSON object that matches this exact structure:
+{
+  "sentimentScore": <number between -1 and 1>,
+  "summary": "<string with markdown formatting>",
+  "keyHeadlines": ["<headline1>", "<headline2>", ...]
+}
 
 User's query: {{{query}}}
 `,
@@ -92,11 +94,60 @@ User's query: {{{query}}}
       outputSchema: MarketSentimentOutputSchema,
     },
     async (input) => {
-      const { output } = await sentimentAnalysisPrompt(input);
-      if (!output) {
-        throw new Error("Sentiment analysis failed to generate. The model returned no output.");
+      try {
+        const { output } = await sentimentAnalysisPrompt(input);
+        
+        if (!output) {
+          console.warn("Model returned null output, providing fallback response");
+          // Fallback response when model fails
+          return {
+            sentimentScore: 0,
+            summary: "Unable to analyze sentiment due to insufficient data or model error.",
+            keyHeadlines: ["No headlines available"]
+          };
+        }
+
+        // Validate the output structure
+        const validatedOutput = MarketSentimentOutputSchema.parse(output);
+        return validatedOutput;
+        
+      } catch (error) {
+        console.error("Sentiment analysis error:", error);
+        
+        // Graceful fallback mechanism if the primary flow fails
+        let headlines: string[] = [`No specific news found for "${input.query}". Market sentiment appears neutral.`];
+        try {
+            const searchResult = await searchTheWebForSentiment(input);
+            headlines = searchResult.headlines;
+        } catch (searchError) {
+            console.error("Fallback search also failed:", searchError);
+        }
+
+        // Simple keyword-based sentiment calculation as a last resort
+        let sentimentScore = 0;
+        const positiveWords = ['positive', 'strong', 'growth', 'beating', 'optimistic', 'game-changer', 'record-breaking', 'hail', 'ambitious'];
+        const negativeWords = ['concerns', 'slowing', 'decline', 'cooling', 'probe', 'constraints', 'competition', 'affordability', 'fears'];
+
+        headlines.forEach(headline => {
+            const lowerHeadline = headline.toLowerCase();
+            positiveWords.forEach(word => {
+                if (lowerHeadline.includes(word)) sentimentScore += 0.2;
+            });
+            negativeWords.forEach(word => {
+                if (lowerHeadline.includes(word)) sentimentScore -= 0.2;
+            });
+        });
+        
+        sentimentScore = Math.max(-1, Math.min(1, sentimentScore)); // Clamp between -1 and 1
+        
+        const sentimentDescription = sentimentScore > 0.1 ? 'cautiously optimistic' : sentimentScore < -0.1 ? 'cautiously pessimistic' : 'neutral';
+        
+        return {
+            sentimentScore,
+            summary: `A fallback analysis based on keyword matching suggests a **${sentimentDescription}** sentiment for **${input.query}**. This is a simplified assessment due to a primary model error.`,
+            keyHeadlines: headlines
+        };
       }
-      return output;
     }
   );
 

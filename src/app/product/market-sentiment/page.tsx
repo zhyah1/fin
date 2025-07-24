@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Loader2, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { analyzeMarketSentiment, type MarketSentimentOutput } from '@/ai/flows/market-sentiment';
+import { analyzeMarketSentiment } from '@/ai/flows/market-sentiment';
+import type { MarketSentimentOutput } from '@/ai/schemas/market-sentiment';
 import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const SentimentGauge = ({ score }: { score: number }) => {
     const percentage = (score + 1) / 2 * 100;
@@ -18,17 +20,17 @@ const SentimentGauge = ({ score }: { score: number }) => {
 
     return (
         <div className="flex flex-col items-center">
-            <div className={`text-6xl font-bold ${color}`}>
-                <Icon className="inline-block h-16 w-16" />
-                {label}
+            <div className={`text-6xl font-bold ${color} flex items-center gap-4`}>
+                <Icon className="h-16 w-16" />
+                <span>{label}</span>
             </div>
-            <div className="w-full bg-gray-700 rounded-full h-4 mt-4">
+            <div className="w-full bg-slate-700 rounded-full h-4 mt-6">
                 <div 
                     className={`h-4 rounded-full transition-all duration-500 ${score > 0.2 ? 'bg-green-500' : score < -0.2 ? 'bg-red-500' : 'bg-yellow-500'}`} 
                     style={{ width: `${percentage}%`}}
                 />
             </div>
-            <div className="text-lg mt-2">Sentiment Score: {score.toFixed(2)}</div>
+            <div className="text-lg mt-3 font-semibold text-gray-200">Sentiment Score: {score.toFixed(2)}</div>
         </div>
     );
 };
@@ -40,15 +42,20 @@ export default function MarketSentimentPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAnalyze = async () => {
+    if (!query.trim()) {
+        setError("Please enter a topic to analyze.");
+        return;
+    }
     setIsLoading(true);
     setAnalysis(null);
     setError(null);
     try {
       const result = await analyzeMarketSentiment({ query });
       setAnalysis(result);
-    } catch (error) {
-      console.error(error);
-      setError('An error occurred while analyzing market sentiment.');
+    } catch (e) {
+      console.error(e);
+      const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+      setError(`An error occurred while analyzing market sentiment: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -77,31 +84,30 @@ export default function MarketSentimentPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="e.g., TSLA, AI Stocks, US Housing Market"
-                className="bg-slate-800/60 border-cyan-400/30 text-base text-center"
-              />
-              <Button
-                onClick={handleAnalyze}
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-lg py-6"
-              >
-                {isLoading ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : 'Analyze Sentiment'}
-              </Button>
+                <div className="flex gap-4">
+                    <Input
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="e.g., TSLA, AI Stocks, US Housing Market"
+                        className="bg-slate-800/60 border-cyan-400/30 text-base flex-grow"
+                        onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
+                    />
+                    <Button
+                        onClick={handleAnalyze}
+                        disabled={isLoading}
+                        className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-lg px-8"
+                    >
+                        {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : 'Analyze'}
+                    </Button>
+                </div>
             </CardContent>
           </Card>
           
           {error && (
-             <Card className="mt-8 bg-red-900/30 border-red-500/50 text-white">
-                <CardHeader>
-                  <CardTitle className="text-2xl text-red-400">Analysis Failed</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>{error}</p>
-                </CardContent>
-              </Card>
+             <Alert variant="destructive" className="mt-8 bg-red-900/30 border-red-500/50 text-red-300">
+                <AlertTitle className="text-red-400">Analysis Failed</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
           )}
 
           {analysis && (
