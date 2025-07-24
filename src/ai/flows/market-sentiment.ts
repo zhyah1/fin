@@ -9,10 +9,15 @@
 import { ai } from '@/ai/genkit';
 import { googleAI } from '@genkit-ai/googleai';
 import { z } from 'zod';
-import { MarketSentimentInputSchema, MarketSentimentOutputSchema } from '../schemas/market-sentiment';
+import { MarketSentimentInputSchema } from '../schemas/market-sentiment';
 import type { MarketSentimentInput, MarketSentimentOutput } from '../schemas/market-sentiment';
 
 export async function analyzeMarketSentiment(input: MarketSentimentInput): Promise<MarketSentimentOutput> {
+  const MarketSentimentOutputSchema = z.object({
+      sentimentScore: z.number().min(-1).max(1).describe("A sentiment score from -1.0 (very negative) to 1.0 (very positive)."),
+      summary: z.string().describe("A concise summary explaining the key drivers of the sentiment, in Markdown format."),
+      keyHeadlines: z.array(z.string()).describe("A list of the key headlines that influenced the sentiment analysis.")
+  });
 
   const searchTheWebForSentiment = ai.defineTool(
     {
