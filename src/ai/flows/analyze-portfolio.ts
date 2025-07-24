@@ -4,8 +4,6 @@
  * @fileOverview A portfolio analysis AI agent.
  *
  * - analyzePortfolio - A function that handles the portfolio analysis process.
- * - AnalyzePortfolioInput - The input type for the analyzePortfolio function.
- * - AnalyzePortfolioOutput - The return type for the analyzePortfolio function.
  */
 
 import { ai } from '@/ai/genkit';
@@ -15,13 +13,10 @@ export async function analyzePortfolio(input: { stocks: string; }): Promise<{ an
   const AnalyzePortfolioInputSchema = z.object({
     stocks: z.string().describe('A comma-separated list of stock tickers.'),
   });
-  type AnalyzePortfolioInput = z.infer<typeof AnalyzePortfolioInputSchema>;
 
   const AnalyzePortfolioOutputSchema = z.object({
     analysis: z.string().describe('The AI-generated analysis of the portfolio.'),
   });
-  type AnalyzePortfolioOutput = z.infer<typeof AnalyzePortfolioOutputSchema>;
-
 
   const getStockInfo = ai.defineTool(
     {
@@ -56,7 +51,7 @@ export async function analyzePortfolio(input: { stocks: string; }): Promise<{ an
 Provide a brief analysis of the portfolio.
 For each stock, use the available tools to get its information.
 Based on the stocks provided, identify potential risks and suggest potential opportunities for diversification or growth.
-Format the output in Markdown.
+Format the analysis content in Markdown.
 
 Your final output must be a JSON object with a single key "analysis" containing your markdown-formatted response.
 
