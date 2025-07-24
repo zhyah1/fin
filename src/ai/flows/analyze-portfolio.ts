@@ -9,7 +9,8 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-export const PortfolioAnalysisOutputSchema = z.object({
+// Define the output schema and type here, but do not export them.
+const PortfolioAnalysisOutputSchema = z.object({
     portfolioAllocation: z.array(z.object({
         ticker: z.string().describe("Stock ticker symbol."),
         companyName: z.string().describe("The name of the company."),
