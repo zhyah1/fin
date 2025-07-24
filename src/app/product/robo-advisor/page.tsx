@@ -97,7 +97,7 @@ export default function RoboAdvisorPage() {
                                                 <FormItem>
                                                     <FormLabel>Your Age</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))} className="bg-slate-800/60 border-cyan-400/30" />
+                                                        <Input type="number" {...field} onChange={e => field.onChange(e.target.value === '' ? 0 : parseInt(e.target.value, 10))} value={field.value || ''} className="bg-slate-800/60 border-cyan-400/30" />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -110,7 +110,7 @@ export default function RoboAdvisorPage() {
                                                 <FormItem>
                                                     <FormLabel>Annual Income (USD)</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))} className="bg-slate-800/60 border-cyan-400/30" />
+                                                        <Input type="number" {...field} onChange={e => field.onChange(e.target.value === '' ? 0 : parseInt(e.target.value, 10))} value={field.value || ''} className="bg-slate-800/60 border-cyan-400/30" />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
