@@ -11,12 +11,12 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-export const AnalyzePortfolioInputSchema = z.object({
+const AnalyzePortfolioInputSchema = z.object({
   stocks: z.string().describe('A comma-separated list of stock tickers.'),
 });
 export type AnalyzePortfolioInput = z.infer<typeof AnalyzePortfolioInputSchema>;
 
-export const AnalyzePortfolioOutputSchema = z.object({
+const AnalyzePortfolioOutputSchema = z.object({
   analysis: z.string().describe('The AI-generated analysis of the portfolio.'),
 });
 export type AnalyzePortfolioOutput = z.infer<typeof AnalyzePortfolioOutputSchema>;
