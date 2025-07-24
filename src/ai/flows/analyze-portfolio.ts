@@ -66,7 +66,7 @@ export async function analyzePortfolio(input: { stocks: string; }): Promise<Port
     input: { schema: AnalyzePortfolioInputSchema },
     output: { schema: PortfolioAnalysisOutputSchema },
     tools: [getStockInfo],
-    model: googleAI.model('gemini-1.5-pro-latest'),
+    model: googleAI.model('gemini-1.5-flash-latest'),
     prompt: `You are a Senior Portfolio Analyst at a top-tier investment firm, equivalent to Bloomberg or Goldman Sachs. Your analysis must be sharp, insightful, and professional.
 A user has provided a list of stock tickers in their portfolio. The user's portfolio is equally weighted across all provided stocks.
 
