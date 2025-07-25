@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Code, GitBranch, Zap, Cpu, Filter, Star, Mail, Linkedin, Calendar, Database, BarChart, Settings, ArrowRight } from 'lucide-react';
+import { Code, GitBranch, Zap, Cpu, Filter, Star, Mail, Linkedin, Calendar, Database, BarChart, Settings, ArrowRight, CheckSquare } from 'lucide-react';
 import Link from 'next/link';
 
 const workflowSteps = [
@@ -201,5 +201,3 @@ export default function SalesAutomationPage() {
     </div>
   );
 }
-
-    
