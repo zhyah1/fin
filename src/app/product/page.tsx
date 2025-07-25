@@ -1,7 +1,7 @@
 
 'use client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BrainCircuit, CandlestickChart, Scale, Bot, Banknote, ShieldCheck, Menu } from "lucide-react";
+import { BrainCircuit, CandlestickChart, Scale, Bot, Banknote, ShieldCheck, Menu, Workflow } from "lucide-react";
 import Image from "next/image";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -34,19 +34,29 @@ export default function ProductPage() {
       title: "Predictive Market Trends",
       description: "Leverage machine learning to forecast market movements. Get data-driven predictions to make smarter investment decisions.",
       icon: <Scale className="h-8 w-8 text-cyan-400" />,
-      gradient: "from-purple-900 via-slate-900 to-slate-900"
+      gradient: "from-purple-900 via-slate-900 to-slate-900",
+      href: "#"
     },
     {
         title: "Fraud Detection AI",
         description: "Protect your assets with our real-time fraud detection system. Our AI constantly monitors transactions for suspicious activity.",
         icon: <ShieldCheck className="h-8 w-8 text-cyan-400" />,
-        gradient: "from-red-900/80 via-slate-900 to-slate-900"
+        gradient: "from-red-900/80 via-slate-900 to-slate-900",
+        href: "#"
     },
     {
         title: "AI-Powered Credit Scoring",
         description: "A more inclusive and accurate credit scoring model using AI to assess creditworthiness based on a wider range of data.",
         icon: <Banknote className="h-8 w-8 text-cyan-400" />,
-        gradient: "from-emerald-900 via-slate-900 to-slate-900"
+        gradient: "from-emerald-900 via-slate-900 to-slate-900",
+        href: "#"
+    },
+    {
+      title: "Business Process Agents",
+      description: "Automate sales, customer service, data analysis, and reporting with a single, powerful AI agent.",
+      icon: <Workflow className="h-8 w-8 text-cyan-400" />,
+      gradient: "from-teal-900 via-slate-900 to-slate-900",
+      href: "#"
     }
   ];
 

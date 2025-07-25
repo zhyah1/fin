@@ -1,7 +1,7 @@
 // Fixed DashboardPage component
 'use client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BrainCircuit, CandlestickChart, Scale, Bot, Banknote, ShieldCheck, LogOut, MessageCircle } from "lucide-react";
+import { BrainCircuit, CandlestickChart, Scale, Bot, Banknote, ShieldCheck, LogOut, MessageCircle, Workflow } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -46,6 +46,12 @@ export default function DashboardPage() {
         description: "A more inclusive and accurate credit scoring model using AI to assess creditworthiness based on a wider range of data.",
         icon: <Banknote className="h-8 w-8 text-cyan-400" />,
         gradient: "from-emerald-900 via-slate-900 to-slate-900"
+    },
+    {
+      title: "Business Process Agents",
+      description: "Automate sales, customer service, data analysis, and reporting with a single, powerful AI agent.",
+      icon: <Workflow className="h-8 w-8 text-cyan-400" />,
+      gradient: "from-teal-900 via-slate-900 to-slate-900"
     }
   ];
 
