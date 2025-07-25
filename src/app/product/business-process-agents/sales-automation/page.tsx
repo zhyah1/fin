@@ -4,50 +4,84 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Loader2, Sparkles, Bot, TrendingUp } from 'lucide-react';
-import { runSalesAgent, type SalesAgentOutput } from '@/ai/flows/sales-agent';
-import ReactMarkdown from 'react-markdown';
+import { Code, GitBranch, Zap, Cpu, Filter, Star, Mail, Linkedin, Calendar, Database, BarChart, Settings, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-const sampleContext = `Product: FinLight AI Suite
-Description: An AI-powered platform for financial analysis, including portfolio management, market sentiment analysis, and a robo-advisor.
-Target Audience: Tech-savvy retail investors and independent financial advisors.
-Pricing: $29/month for the Pro plan.
-Unique Selling Proposition: We offer a more comprehensive set of AI tools than competitors at a lower price point.
+const workflowSteps = [
+    { title: "Lead Capture & Processing", icon: <Zap />, description: "Ingests leads from web forms, emails, LinkedIn, and APIs in real-time." },
+    { title: "Lead Enrichment & Research", icon: <Cpu />, description: "Automatically researches leads, gathering company info, tech stack, and contact details." },
+    { title: "Lead Scoring & Qualification", icon: <Filter />, description: "Scores leads based on custom rules to prioritize high-value prospects." },
+    { title: "Personalized Outreach", icon: <Mail />, description: "Generates hyper-personalized emails using enriched data and dynamic templates." },
+    { title: "Multi-Channel Follow-up", icon: <GitBranch />, description: "Executes automated follow-up sequences across email and LinkedIn." },
+    { title: "Response Handling", icon: <Star />, description: "Classifies responses and manages conversations, handling objections and scheduling meetings." },
+    { title: "Meeting Scheduling & Handoff", icon: <Calendar />, description: "Manages calendars, sends invites, and generates pre-meeting briefs for sales reps." },
+    { title: "CRM Integration", icon: <Database />, description: "Keeps your CRM perfectly in sync, logging all activities and updating records automatically." },
+    { title: "Learning & Optimization", icon: <BarChart />, description: "Continuously tracks performance, A/B tests campaigns, and optimizes its own strategies." },
+];
+
+const keyBenefits = {
+    salesTeams: [
+        "5x more qualified conversations per rep",
+        "80% reduction in manual research time",
+        "24/7 lead response capability",
+        "No leads fall through the cracks",
+        "Data-driven insights for improvement"
+    ],
+    companies: [
+        "40-60% increase in pipeline generation",
+        "25-35% improvement in conversion rates",
+        "Scalable growth without proportional hiring",
+        "Better lead qualification & resource allocation",
+        "Comprehensive tracking and ROI measurement"
+    ]
+};
+
+const emailExample = `
+Subject: Re: Your cloud migration inquiry - TechCorp's scaling solution
+
+Hi John,
+
+I noticed TechCorp's recent $10M Series B and your team's expansion - congratulations! With 200+ employees now, you're probably hitting those scaling bottlenecks that made legacy infrastructure painful.
+
+Given your current AWS setup, you're likely dealing with:
+- Multi-cloud complexity as you grow
+- Security compliance for enterprise clients
+- DevOps team stretched thin managing hybrid environment
+
+We helped DataFlow Inc (similar size, same challenges) reduce infrastructure management overhead by 60% while improving security posture.
+
+Worth a 15-minute conversation? I can show you their before/after setup.
+
+Best regards,
+[Sales Agent]
+
+P.S. Saw your team's hiring spree for DevOps - smart move for the growth phase!
 `;
 
-export default function SalesAutomationPage() {
-  const [salesContext, setSalesContext] = useState(sampleContext);
-  const [task, setTask] = useState('Write a brief, compelling cold email to a potential user who fits our target audience.');
-  const [result, setResult] = useState<SalesAgentOutput | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+const apiExample = `
+// Webhook for Real-time Lead Processing
+POST /api/v1/leads/new
+{
+  "lead_data": {
+    "name": "John Smith",
+    "email": "john@techcorp.com",
+    "company": "TechCorp Inc",
+    "message": "Interested in cloud migration"
+  },
+  "source": "website_form",
+  "campaign_id": "cloud_migration_2024"
+}
 
-  const handleRunAgent = async () => {
-    setIsLoading(true);
-    setResult(null);
-    setError(null);
-    try {
-      const response = await runSalesAgent({ salesContext, task });
-      setResult(response);
-    } catch (e) {
-      console.error(e);
-      const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-      setError(`An error occurred while running the sales agent: ${errorMessage}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const examples = [
-    "Draft a follow-up email for a user who attended our webinar but didn't sign up.",
-    "Generate 5 engaging subject lines for an email campaign promoting our new Robo-Advisor feature.",
-    "Create a short script for a sales call to a prospective financial advisor.",
-    "List three potential lead qualification questions to ask on our pricing page.",
-  ];
+// CRM Synchronization
+PUT /api/v1/leads/{lead_id}/assign_rep
+{
+  "rep_id": "sales_rep_123",
+  "handoff_notes": "Hot lead, score 88. Mentioned scaling issues."
+}
+`;
+
+
+export default function SalesAutomationPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -63,95 +97,109 @@ export default function SalesAutomationPage() {
             </div>
       </header>
       <main className="px-4 py-16 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-                 <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl flex items-center justify-center gap-4">
-                    <TrendingUp className="h-12 w-12" /> Sales Automation Agent
+        <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-20">
+                 <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
+                    Automate Your Entire Sales Funnel with AI
                 </h1>
-                <p className="mt-6 max-w-2xl mx-auto text-xl text-gray-300">
-                    Your expert AI assistant for drafting emails, generating leads, and creating sales strategies.
+                <p className="mt-6 max-w-3xl mx-auto text-xl text-gray-300">
+                    From lead capture to close, our AI agent manages the full sales cycle, so your team can focus on what they do best: selling.
                 </p>
+                 <Button size="lg" className="mt-8 px-8 py-4 text-lg font-bold bg-white text-black rounded-full transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-white/30 transform group">
+                     Request a Demo <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                 </Button>
             </div>
             
-          <Card className="bg-slate-900/50 border-cyan-400/20 text-white">
-            <CardHeader>
-              <CardTitle className="text-3xl text-center flex items-center justify-center gap-3"><Bot /> Interactive Demo</CardTitle>
-              <CardDescription className="text-center text-lg text-gray-300">
-                Provide your sales context and a specific task to see the agent work its magic.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div>
-                    <label className="text-lg font-semibold mb-2 block">Sales Context</label>
-                    <Textarea
-                        value={salesContext}
-                        onChange={(e) => setSalesContext(e.target.value)}
-                        placeholder="Provide product details, target audience, pricing, etc."
-                        className="bg-slate-800/60 border-cyan-400/30 min-h-[150px] text-base"
-                    />
+            <div className="mb-20">
+                <h2 className="text-3xl font-bold text-center mb-12">The Complete Sales Workflow, Automated</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {workflowSteps.map(step => (
+                        <Card key={step.title} className="bg-slate-900/50 border-cyan-400/20 text-white flex flex-col">
+                           <CardHeader className="flex flex-row items-center gap-4">
+                               <div className="text-cyan-400">{step.icon}</div>
+                               <CardTitle className="text-lg">{step.title}</CardTitle>
+                           </CardHeader>
+                           <CardContent>
+                               <p className="text-gray-300">{step.description}</p>
+                           </CardContent>
+                        </Card>
+                    ))}
                 </div>
-                 <div>
-                    <label className="text-lg font-semibold mb-2 block">Sales Task</label>
-                    <Input
-                        value={task}
-                        onChange={(e) => setTask(e.target.value)}
-                        placeholder="e.g., 'Draft a follow-up email...'"
-                        className="bg-slate-800/60 border-cyan-400/30 text-base"
-                        onKeyDown={(e) => e.key === 'Enter' && handleRunAgent()}
-                    />
-                </div>
-              <Button
-                onClick={handleRunAgent}
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-lg py-6"
-              >
-                {isLoading ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <><Sparkles className="mr-2 h-6 w-6" /> Run Sales Agent</>}
-              </Button>
-            </CardContent>
-          </Card>
-          
-          <div className="mt-8">
-            <Card className="bg-slate-900/50 border-cyan-400/20">
-                <CardHeader>
-                    <CardTitle>Example Tasks</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <ul className="space-y-2 text-gray-300">
-                        {examples.map((ex, i) => (
-                            <li key={i} className="flex items-start gap-2">
-                                <Button variant="link" size="sm" className="text-cyan-400 text-left p-0 h-auto" onClick={() => setTask(ex)}>
-                                    "{ex}"
-                                </Button>
-                            </li>
-                        ))}
-                    </ul>
-                </CardContent>
-            </Card>
-          </div>
-
-          {error && (
-             <Alert variant="destructive" className="mt-8 bg-red-900/30 border-red-500/50 text-red-300">
-                <AlertTitle className="text-red-400">Agent Execution Failed</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-          )}
-
-          {result && (
-            <div className="mt-8">
-              <Card className="bg-slate-900/50 border-cyan-400/20 text-white">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Sales Agent Response</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose prose-invert max-w-none text-gray-300 bg-slate-800/50 p-4 rounded-md">
-                      <ReactMarkdown>{result.response}</ReactMarkdown>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
-          )}
+
+            <div className="mb-20">
+                <h2 className="text-3xl font-bold text-center mb-12">Dynamic, Personalized Outreach at Scale</h2>
+                <Card className="bg-slate-900/50 border-cyan-400/20 text-white overflow-hidden">
+                    <CardHeader>
+                        <CardTitle>Generated Email Example</CardTitle>
+                        <CardDescription>The AI crafts unique emails by analyzing all collected data points.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="bg-black/50 p-4 rounded-md">
+                            <pre className="whitespace-pre-wrap text-sm text-gray-200">
+                                <code>{emailExample}</code>
+                            </pre>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+            
+            <div className="mb-20">
+                <h2 className="text-3xl font-bold text-center mb-12">Key Benefits</h2>
+                <div className="grid md:grid-cols-2 gap-8">
+                     <Card className="bg-slate-900/50 border-cyan-400/20 text-white">
+                         <CardHeader>
+                             <CardTitle className="text-2xl">For Your Sales Team</CardTitle>
+                         </CardHeader>
+                         <CardContent>
+                             <ul className="space-y-3">
+                                 {keyBenefits.salesTeams.map(benefit => (
+                                     <li key={benefit} className="flex items-center gap-3">
+                                         <CheckSquare className="h-5 w-5 text-green-400" />
+                                         <span className="text-gray-300">{benefit}</span>
+                                     </li>
+                                 ))}
+                             </ul>
+                         </CardContent>
+                     </Card>
+                      <Card className="bg-slate-900/50 border-cyan-400/20 text-white">
+                         <CardHeader>
+                             <CardTitle className="text-2xl">For Your Business</CardTitle>
+                         </CardHeader>
+                         <CardContent>
+                             <ul className="space-y-3">
+                                 {keyBenefits.companies.map(benefit => (
+                                     <li key={benefit} className="flex items-center gap-3">
+                                         <CheckSquare className="h-5 w-5 text-green-400" />
+                                         <span className="text-gray-300">{benefit}</span>
+                                     </li>
+                                 ))}
+                             </ul>
+                         </CardContent>
+                     </Card>
+                </div>
+            </div>
+
+            <div>
+                <h2 className="text-3xl font-bold text-center mb-12">Seamless API & CRM Integration</h2>
+                <Card className="bg-slate-900/50 border-cyan-400/20 text-white overflow-hidden">
+                    <CardHeader>
+                        <CardTitle>API Integration Points</CardTitle>
+                        <CardDescription>Integrate the agent directly into your existing systems with simple webhooks and API calls.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                       <div className="bg-black/50 p-4 rounded-md">
+                            <pre className="whitespace-pre-wrap text-sm text-gray-200">
+                                <code>{apiExample}</code>
+                            </pre>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
       </main>
     </div>
   );
 }
+
+    
