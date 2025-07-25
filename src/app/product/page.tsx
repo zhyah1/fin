@@ -1,7 +1,7 @@
 
 'use client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BrainCircuit, CandlestickChart, Scale, Bot, Banknote, ShieldCheck, Menu } from "lucide-react";
+import { BrainCircuit, CandlestickChart, Scale, Bot, Banknote, ShieldCheck, Menu, Workflow } from "lucide-react";
 import Image from "next/image";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -13,37 +13,50 @@ export default function ProductPage() {
       title: "AI Portfolio Analyst",
       description: "Get deep insights into your investment portfolio. Our AI analyzes your holdings, identifies risks, and suggests opportunities for growth.",
       icon: <BrainCircuit className="h-8 w-8 text-cyan-400" />,
-      gradient: "from-cyan-900 via-slate-900 to-slate-900"
+      gradient: "from-cyan-900 via-slate-900 to-slate-900",
+      href: "/product/portfolio-analyst"
     },
     {
       title: "Market Sentiment AI",
       description: "Stay ahead of market trends by understanding the sentiment. We analyze news, social media, and financial reports in real-time.",
       icon: <CandlestickChart className="h-8 w-8 text-cyan-400" />,
-      gradient: "from-blue-900 via-slate-900 to-slate-900"
+      gradient: "from-blue-900 via-slate-900 to-slate-900",
+      href: "/product/market-sentiment"
     },
     {
       title: "Robo-Advisor",
       description: "Automated, algorithm-driven financial planning services with little to no human supervision. Your personal AI financial guide.",
       icon: <Bot className="h-8 w-8 text-cyan-400" />,
-      gradient: "from-indigo-900 via-slate-900 to-slate-900"
+      gradient: "from-indigo-900 via-slate-900 to-slate-900",
+      href: "/product/robo-advisor"
     },
     {
       title: "Predictive Market Trends",
       description: "Leverage machine learning to forecast market movements. Get data-driven predictions to make smarter investment decisions.",
       icon: <Scale className="h-8 w-8 text-cyan-400" />,
-      gradient: "from-purple-900 via-slate-900 to-slate-900"
+      gradient: "from-purple-900 via-slate-900 to-slate-900",
+      href: "#"
     },
     {
         title: "Fraud Detection AI",
         description: "Protect your assets with our real-time fraud detection system. Our AI constantly monitors transactions for suspicious activity.",
         icon: <ShieldCheck className="h-8 w-8 text-cyan-400" />,
-        gradient: "from-red-900/80 via-slate-900 to-slate-900"
+        gradient: "from-red-900/80 via-slate-900 to-slate-900",
+        href: "#"
     },
     {
         title: "AI-Powered Credit Scoring",
         description: "A more inclusive and accurate credit scoring model using AI to assess creditworthiness based on a wider range of data.",
         icon: <Banknote className="h-8 w-8 text-cyan-400" />,
-        gradient: "from-emerald-900 via-slate-900 to-slate-900"
+        gradient: "from-emerald-900 via-slate-900 to-slate-900",
+        href: "#"
+    },
+    {
+      title: "Business Process Agents",
+      description: "Automate sales, customer service, data analysis, and reporting with a single, powerful AI agent.",
+      icon: <Workflow className="h-8 w-8 text-cyan-400" />,
+      gradient: "from-teal-900 via-slate-900 to-slate-900",
+      href: "/product/business-process-agents"
     }
   ];
 
@@ -113,18 +126,20 @@ export default function ProductPage() {
         <div className="mt-16 max-w-7xl mx-auto grid gap-8 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1">
           {products.map((product) => (
             <Card key={product.title} className="bg-slate-900/50 border-cyan-400/20 text-white flex flex-col overflow-hidden transition-all duration-300 hover:border-cyan-400/60 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/20">
-              <CardHeader className="flex flex-row items-start gap-4">
-                <div className="flex-shrink-0">{product.icon}</div>
-                <div>
-                  <CardTitle className="text-xl font-bold text-white">{product.title}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <div className="aspect-video relative mb-4">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${product.gradient} rounded-md`}></div>
-                </div>
-                <CardDescription className="text-gray-300 text-base">{product.description}</CardDescription>
-              </CardContent>
+                <Link href={product.href || '#'} className="flex flex-col h-full">
+                    <CardHeader className="flex flex-row items-start gap-4">
+                        <div className="flex-shrink-0">{product.icon}</div>
+                        <div>
+                        <CardTitle className="text-xl font-bold text-white">{product.title}</CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="flex-grow">
+                        <div className="aspect-video relative mb-4">
+                        <div className={`absolute inset-0 bg-gradient-to-br ${product.gradient} rounded-md`}></div>
+                        </div>
+                        <CardDescription className="text-gray-300 text-base">{product.description}</CardDescription>
+                    </CardContent>
+                </Link>
             </Card>
           ))}
         </div>
