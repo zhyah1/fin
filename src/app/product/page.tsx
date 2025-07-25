@@ -56,7 +56,7 @@ export default function ProductPage() {
       description: "Automate sales, customer service, data analysis, and reporting with a single, powerful AI agent.",
       icon: <Workflow className="h-8 w-8 text-cyan-400" />,
       gradient: "from-teal-900 via-slate-900 to-slate-900",
-      href: "#"
+      href: "/product/business-process-agents"
     }
   ];
 
