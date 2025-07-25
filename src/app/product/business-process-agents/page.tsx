@@ -45,7 +45,7 @@ export default function BusinessAgentPage() {
   const capabilities = [
     { title: "Sales Automation", description: "Draft compelling sales emails, generate leads, and create sales reports.", href: "/product/business-process-agents/sales-automation" },
     { title: "Customer Service", description: "Answer customer questions, resolve issues, and summarize feedback.", href: "/product/business-process-agents/customer-service" },
-    { title: "Data Analysis", description: "Analyze sales data, identify trends, and generate business insights.", href: "#" },
+    { title: "Data Analysis", description: "Analyze sales data, identify trends, and generate business insights.", href: "/product/business-process-agents/data-analysis" },
     { title: "Reporting", description: "Create weekly sales summaries, marketing campaign reports, and financial overviews.", href: "#" },
   ];
 
